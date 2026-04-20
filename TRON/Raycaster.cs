@@ -8,46 +8,121 @@ using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Web;
+using TRON;
 
 namespace Void
 {
     internal class Raycaster
     {
         private int resolution;
+        double[] zBuffer;
         internal Raycaster()
         {
             resolution = ConsoleBuffer.Width;
+            zBuffer = new double[resolution];
+        }
+        internal void DrawDisc(Disc disc)
+        {
+            if (!disc.isActive) return;
+
+            double dx = disc.position.x - Game.player.position.x;
+            double dy = disc.position.y - Game.player.position.y;
+            double distToDisc = Math.Sqrt(dx * dx + dy * dy);
+
+            double angleToDisc = Math.Atan2(dy, dx);
+            double relativeAngle = angleToDisc - Game.player.dir;
+
+            while (relativeAngle < -Math.PI) relativeAngle += 2 * Math.PI;
+            while (relativeAngle > Math.PI) relativeAngle -= 2 * Math.PI;
+
+            double fov = Math.PI / 3;
+            int screenX = (int)((relativeAngle / (fov / 2)) * (resolution / 2) + (resolution / 2));
+
+            if (screenX >= 0 && screenX < resolution)
+            {
+                if (distToDisc < zBuffer[screenX])
+                {
+
+                    int baseHeight = (int)(ConsoleBuffer.Height / distToDisc);
+                    int screenMid = ConsoleBuffer.Height / 2;
+
+                    int startY = screenMid - (baseHeight / 20);
+                    int endY = screenMid + (baseHeight / 20);
+
+
+                    int halfWidth = (int)(15 / distToDisc);
+
+                    for (int xOffset = -halfWidth; xOffset <= halfWidth; xOffset++)
+                    {
+                        int targetX = screenX + xOffset;
+                        if (targetX >= 0 && targetX < resolution)
+                        {
+                            if (distToDisc < zBuffer[targetX])
+                            {
+                                for (int y = startY; y <= endY; y++)
+                                {
+                                    if (y >= 0 && y < ConsoleBuffer.Height)
+                                        ConsoleBuffer.Write(targetX, y, "█", 0, 255, 255);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        internal void DrawVerticalLine(int x, int startY, int endY, byte r, byte g, byte b, int side, bool verticalStripe = false, char c = '█')
+        {
+            ConsoleBuffer.Write(x, startY, c.ToString(), r, g, b);
+            if (!verticalStripe)
+                for (int i = startY + 1; i < endY; i++)
+                    if (side == 0)
+                        ConsoleBuffer.Write(x, i, c.ToString(), 10, 10, 10);
+                    else
+                        ConsoleBuffer.Write(x, i, c.ToString(), 15, 15, 15);
+            else
+                for (int i = startY + 1; i < endY; i++)
+                    ConsoleBuffer.Write(x, i, c.ToString(), r, g, b);
+            ConsoleBuffer.Write(x, endY, c.ToString(), r, g, b);
         }
         internal void Raycast(Coordinates position, double dir)
         {
             Ray r = new Ray();
-            double lastDistance = 0;
+            double lastLineHeight = 0;
             double previousJump = 0;
+
             for (int i = 0; i < resolution; i++)
             {
                 double cameraX = 2.0 * i / resolution - 1.0;
                 double rayDir = dir + cameraX * (Math.PI / 3);
 
-                double distance = r.Cast(position, rayDir);
-                if (double.IsInfinity(distance) || double.IsNaN(distance))
-                    distance = 1000;
-                if (i == 0) lastDistance = distance;
-                int lineHeight = (int)(distance);
-                int screenMidPoint = ConsoleBuffer.Height / 2;
+                double lineHeight = r.Cast(position, rayDir);
 
-                int startY = screenMidPoint - (lineHeight / 2);
-                int endY = screenMidPoint + (lineHeight / 2);
+                double distance = (double)ConsoleBuffer.Height / lineHeight;
+                zBuffer[i] = distance;
+
+                if (double.IsInfinity(lineHeight) || double.IsNaN(lineHeight))
+                    lineHeight = 1000;
+
+                if (i == 0) lastLineHeight = lineHeight;
+
+                int screenMidPoint = ConsoleBuffer.Height / 2;
+                int startY = screenMidPoint - ((int)lineHeight / 2);
+                int endY = screenMidPoint + ((int)lineHeight / 2);
 
                 if (startY < 0) startY = 0;
+
                 if (endY >= ConsoleBuffer.Height) endY = ConsoleBuffer.Height - 1;
 
-                if (Math.Abs(previousJump - Math.Abs(distance - lastDistance)) > 0.1)
-                    r.DrawVerticalLine(i, startY, endY, 125, 253, 254, true);
+                if (Math.Abs(previousJump - Math.Abs(lineHeight - lastLineHeight)) > 0.6)
+
+                    DrawVerticalLine(i, startY, endY, 125, 253, 254, r.side, true);
+
                 else
-                    r.DrawVerticalLine(i, startY, endY, 125, 253, 254);
-                previousJump = Math.Abs(distance - lastDistance);
-                lastDistance = distance;
+                    DrawVerticalLine(i, startY, endY, 125, 253, 254, r.side);
+                previousJump = Math.Abs(lineHeight - lastLineHeight);
+                lastLineHeight = lineHeight;
             }
+            DrawDisc(Game.player.disc);
         }
     }
     internal class Ray
@@ -63,27 +138,13 @@ namespace Void
         private double deltaY;
         private int x;
         private int y;
-        private int side;
+        internal int side;
         private double distance;
         private Coordinates hit;
 
         internal Ray()
         {
             hitWall = false;
-        }
-        internal void DrawVerticalLine(int x, int startY, int endY, byte r, byte g, byte b, bool verticalStripe = false, char c = '█')
-        {
-            ConsoleBuffer.Write(x, startY, c.ToString(), r, g, b);
-            if (!verticalStripe)
-                for (int i = startY + 1; i < endY; i++)
-                        if (side == 0)
-                            ConsoleBuffer.Write(x, i, c.ToString(), 10, 10, 10);
-                        else
-                            ConsoleBuffer.Write(x, i, c.ToString(), 15, 15, 15);
-            else
-                for (int i = startY + 1; i < endY; i++)
-                    ConsoleBuffer.Write(x, i, c.ToString(), r, g, b);
-            ConsoleBuffer.Write(x, endY, c.ToString(), r, g, b);
         }
         private void CalculateValuesForCasting(Coordinates position, double dir)
         {
@@ -147,13 +208,6 @@ namespace Void
 
             double lineHeight = ConsoleBuffer.Height / distance;
             return lineHeight;
-        }
-        internal bool IsOnEdge()
-        {
-            const double threshold = 0.001;
-            double remainderX = hit.x % 1;
-            double remainderY = hit.y % 1;
-            return ((remainderX < threshold || (1 - remainderX) > threshold) || (remainderY < threshold || (1 - remainderY) > threshold));
         }
     }
 }

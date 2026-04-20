@@ -85,7 +85,8 @@ namespace Void
         {
             if (Game.currentKeystrokes.Contains("TAB"))
             {
-                disc.Throw(position, dir);
+                if (!disc.isActive)
+                    disc.Throw(position, dir);
             }
         }
     }

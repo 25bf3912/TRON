@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using System.Security;
 using System.Text;
+using NAudio.Wave;
 
 namespace Void
 {
@@ -52,7 +53,7 @@ namespace Void
             }
             player.disc.Move();
             r.Raycast(player.position, player.dir);
-            World.DrawMinimap();
+            World.DrawHud();
             ConsoleBuffer.Draw();
 
             tick++;
@@ -88,7 +89,6 @@ namespace Void
         {
             Random rng = new Random();
 
-            // fill grid with border
             for (int i = 0; i < grid.GetLength(0); i++)
                 for (int j = 0; j < grid.GetLength(1); j++)
                     if (i == 0 || j == 0 || i == grid.GetLength(0) - 1 || j == grid.GetLength(1) - 1)
@@ -105,7 +105,29 @@ namespace Void
             ConsoleBuffer.Write((int)Game.player.position.x, (int)Game.player.position.y, "█", 255, 0, 0);
             ConsoleBuffer.Write((int)Game.player.disc.position.x, (int)Game.player.disc.position.y, "█", 0, 255, 0);
         }
+        internal static void DrawHud()
+        {
+            DrawCrosshair();
+            DrawMinimap();
+        }
+        private static void DrawCrosshair()
+        {
+            int centerX = ConsoleBuffer.Width / 2;
+            int centerY = ConsoleBuffer.Height / 2;
+            int sizeX = 5;
+            int sizeY = 2;
 
+            for (int x = centerX - sizeX + 1; x <= centerX + sizeX; x++)
+            {
+                if (x == centerX || x == centerX + 1) continue;
+                ConsoleBuffer.Write(x, centerY, "█", 255, 255, 255);
+            }
+            for (int y = centerY - sizeY; y <= centerY + sizeY; y++)
+            {
+                if (y == centerY) continue;
+                ConsoleBuffer.Write(centerX, y, "██", 255, 255, 255);
+            }
+        }
     }
     
 }

@@ -1,4 +1,5 @@
 ﻿using CustomConsole;
+using NAudio.Wave;
 
 namespace Void
 {
@@ -31,16 +32,21 @@ namespace Void
         {
             CalibrateScreen(944, 206);
             Menu menu = new Menu(ConsoleBuffer.Width / 2 - 50, ConsoleBuffer.Height / 2 - 12, 100, 25, (255, 255, 255), "PAUSE MENU");
-            while (true)
+            using (var audioFile = new AudioFileReader("INIT.m4a"))
+            using (var outputDevice = new WaveOutEvent())
             {
-                Game.Tick();
-                if (!Game.isRunning)
+                outputDevice.Init(audioFile);
+                outputDevice.Play();
+                while (true)
                 {
-                    menu.DrawBox();
-                    ConsoleBuffer.Draw();
+                    Game.Tick();
+                    if (!Game.isRunning)
+                    {
+                        menu.DrawBox();
+                        ConsoleBuffer.Draw();
+                    }
                 }
             }
-
         }
     }
 }
