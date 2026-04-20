@@ -45,11 +45,12 @@ namespace Void
 
             player.Move();
             player.Rotate();
+            player.TakeInputs();
             foreach (Entity e in allEntities)
             {
                 e.Move();
             }
-
+            player.disc.Move();
             r.Raycast(player.position, player.dir);
             World.DrawMinimap();
             ConsoleBuffer.Draw();
@@ -100,8 +101,9 @@ namespace Void
         {
             for (int i = 0; i < grid.GetLength(0); i++)
                 for (int j = 0; j < grid.GetLength(1); j++)
-                    ConsoleBuffer.Write(i, j, new string(grid[i, j], 2), 125, 253, 254);
+                    ConsoleBuffer.Write(i, j, new string(grid[i, j], 2), 255, 255, 255);
             ConsoleBuffer.Write((int)Game.player.position.x, (int)Game.player.position.y, "█", 255, 0, 0);
+            ConsoleBuffer.Write((int)Game.player.disc.position.x, (int)Game.player.disc.position.y, "█", 0, 255, 0);
         }
 
     }

@@ -5,16 +5,19 @@ using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using LaglessKeyboardInput;
+using TRON;
 
 namespace Void
 {
     internal class Player : Entity
     {
+        internal Disc disc;
         internal Player()
         {
             speed = 0.05;
             position.x = 2;
             position.y = 2;
+            disc = new Disc();
         }
         internal override void Move()
         {
@@ -77,6 +80,13 @@ namespace Void
             dir %= (Math.PI * 2);
             if (dir < 0)
                 dir += Math.PI * 2;
+        }
+        internal void TakeInputs()
+        {
+            if (Game.currentKeystrokes.Contains("TAB"))
+            {
+                disc.Throw(position, dir);
+            }
         }
     }
 }
