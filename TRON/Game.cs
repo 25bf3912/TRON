@@ -12,7 +12,7 @@ namespace Void
 {
     internal static class Game
     {
-        private static int tick;
+        internal static int tick { get; private set; }
         private static int desiredFps;
         private static int pause;
         internal static bool isRunning { get; private set; }
@@ -51,7 +51,7 @@ namespace Void
             }
 
             r.Raycast(player.position, player.dir);
-
+            World.DrawMinimap();
             ConsoleBuffer.Draw();
 
             tick++;
@@ -71,77 +71,39 @@ namespace Void
         {
             if (currentKeystrokes.Contains("ESCAPE"))
                 isRunning = !isRunning;
+            if (currentKeystrokes.Contains("R"))
+                World.GenerateGrid();
         }
     }
     internal static class World
     {
-        internal static int[,] grid { get; private set; }
-        static World() 
+        internal static char[,] grid { get; private set; }
+        static World()
         {
-            grid = GenerateGrid();
+            grid = new char[64,32];
+            GenerateGrid();
         }
-        static int[,] GenerateGrid()
+        internal static void GenerateGrid()
         {
-            int size = 64;
-            int[,] grid = new int[size, size];
+            Random rng = new Random();
 
-            // fill walls
-            for (int y = 0; y < size; y++)
-                for (int x = 0; x < size; x++)
-                    grid[y, x] = 1;
+            // fill grid with border
+            for (int i = 0; i < grid.GetLength(0); i++)
+                for (int j = 0; j < grid.GetLength(1); j++)
+                    if (i == 0 || j == 0 || i == grid.GetLength(0) - 1 || j == grid.GetLength(1) - 1)
+                        grid[i, j] = '█';
+                    else
+                        grid[i, j] = rng.NextDouble() < 0.25 ? '█' : ' ';
+            grid[1, 1] = ' ';
+        }
+        internal static void DrawMinimap()
+        {
+            for (int i = 0; i < grid.GetLength(0); i++)
+                for (int j = 0; j < grid.GetLength(1); j++)
+                    ConsoleBuffer.Write(i, j, new string(grid[i, j], 2), 255, 255, 255);
+            ConsoleBuffer.Write((int)Game.player.position.x, (int)Game.player.position.y, "█", 255, 0, 0);
+        }
 
-            void Carve(int x, int y, int w, int h)
-            {
-                if (w < 4 || h < 4) return;
-
-                bool horizontal = w < h;
-
-                if (horizontal)
-                {
-                    int wallY = y + 2 + Random.Shared.Next(h - 3);
-                    int passageX = x + 1 + Random.Shared.Next(w - 2);
-
-                    for (int i = x; i < x + w; i++)
-                        grid[wallY, i] = 1;
-
-                    grid[wallY, passageX] = 0;
-
-                    Carve(x, y, w, wallY - y);
-                    Carve(x, wallY + 1, w, y + h - wallY - 1);
-                }
-                else
-                {
-                    int wallX = x + 2 + Random.Shared.Next(w - 3);
-                    int passageY = y + 1 + Random.Shared.Next(h - 2);
-
-                    for (int i = y; i < y + h; i++)
-                        grid[i, wallX] = 1;
-
-                    grid[passageY, wallX] = 0;
-
-                    Carve(x, y, wallX - x, h);
-                    Carve(wallX + 1, y, x + w - wallX - 1, h);
-                }
-            }
-
-            // open starting area
-            for (int y = 0; y < size; y++)
-                for (int x = 0; x < size; x++)
-                    grid[y, x] = 0;
-
-            Carve(0, 0, size, size);
-
-            // border walls
-            for (int i = 0; i < size; i++)
-            {
-                grid[0, i] = 1;
-                grid[size - 1, i] = 1;
-                grid[i, 0] = 1;
-                grid[i, size - 1] = 1;
-            }
-
-            return grid;
-        } // NEED TO REPLACE THIS
     }
     
 }

@@ -12,7 +12,7 @@ namespace Void
     {
         internal Player()
         {
-            speed = 0.1;
+            speed = 0.05;
             position.x = 2;
             position.y = 2;
         }
@@ -62,10 +62,10 @@ namespace Void
             double newX = position.x + moveX * speed;
             double newY = position.y + moveY * speed;
 
-            if (World.grid[(int)newX, (int)position.y] == 0)
+            if (World.grid[(int)newX, (int)position.y] == ' ')
                 position.x = newX;
 
-            if (World.grid[(int)position.x, (int)newY] == 0)
+            if (World.grid[(int)position.x, (int)newY] == ' ')
                 position.y = newY;
         }
         internal override void Rotate()
