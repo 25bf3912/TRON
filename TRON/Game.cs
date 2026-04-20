@@ -100,7 +100,7 @@ namespace Void
         {
             for (int i = 0; i < grid.GetLength(0); i++)
                 for (int j = 0; j < grid.GetLength(1); j++)
-                    ConsoleBuffer.Write(i, j, new string(grid[i, j], 2), 255, 255, 255);
+                    ConsoleBuffer.Write(i, j, new string(grid[i, j], 2), 125, 253, 254);
             ConsoleBuffer.Write((int)Game.player.position.x, (int)Game.player.position.y, "█", 255, 0, 0);
         }
 

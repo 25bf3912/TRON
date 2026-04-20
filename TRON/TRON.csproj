@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="CustomConsoleLibrary">
       <HintPath>..\..\Libraries\CustomConsoleLibrary\CustomConsoleLibrary\bin\Debug\net10.0\CustomConsoleLibrary.dll</HintPath>
     </Reference>

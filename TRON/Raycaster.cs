@@ -18,44 +18,11 @@ namespace Void
         {
             resolution = ConsoleBuffer.Width;
         }
-        private void VoidFog(double distance, out byte red, out byte green, out byte blue)
-        {
-            const double fogStartDistance = 10;
-            const double fogEndDistance = 200.0;
-
-            if (double.IsNaN(distance) || double.IsInfinity(distance))
-                distance = fogEndDistance;
-
-            distance = Math.Clamp(distance, fogStartDistance, fogEndDistance);
-
-            double t = (distance - fogStartDistance) / (fogEndDistance - fogStartDistance);
-            t = Math.Clamp(t, 0.0, 1.0);
-
-            const double nearRed = 20, nearGreen = 20, nearBlue = 20;
-
-            const double farRed = 10, farGreen = 10, farBlue = 10;
-
-            red = (byte)(farRed + (nearRed - farRed) * t);
-            green = (byte)(farGreen + (nearGreen - farGreen) * t);
-            blue = (byte)(farBlue + (nearBlue - farBlue) * t);
-
-            red = Math.Clamp(red, (byte)0, (byte)255);
-            green = Math.Clamp(green, (byte)0, (byte)255);
-            blue = Math.Clamp(blue, (byte)0, (byte)255);
-        }
-        private void DrawFloor()
-        {
-            int midHeight = ConsoleBuffer.Height / 2;
-            for (int i = ConsoleBuffer.Height; i >= midHeight; i--) 
-            {
-                VoidFog(Math.Pow(i, 0.8), out byte red, out byte green, out byte blue);
-                ConsoleBuffer.Write(0, i, new string('█', ConsoleBuffer.Width), red, green, blue);
-            }
-        }
         internal void Raycast(Coordinates position, double dir)
         {
             Ray r = new Ray();
-            //DrawFloor();
+            double lastDistance = 0;
+            double previousJump = 0;
             for (int i = 0; i < resolution; i++)
             {
                 double cameraX = 2.0 * i / resolution - 1.0;
@@ -64,7 +31,7 @@ namespace Void
                 double distance = r.Cast(position, rayDir);
                 if (double.IsInfinity(distance) || double.IsNaN(distance))
                     distance = 1000;
-
+                if (i == 0) lastDistance = distance;
                 int lineHeight = (int)(distance);
                 int screenMidPoint = ConsoleBuffer.Height / 2;
 
@@ -74,8 +41,12 @@ namespace Void
                 if (startY < 0) startY = 0;
                 if (endY >= ConsoleBuffer.Height) endY = ConsoleBuffer.Height - 1;
 
-
-                r.DrawVerticalLine(i, startY, endY, 125, 253, 254);
+                if (Math.Abs(previousJump - Math.Abs(distance - lastDistance)) > 0.1)
+                    r.DrawVerticalLine(i, startY, endY, 125, 253, 254, true);
+                else
+                    r.DrawVerticalLine(i, startY, endY, 125, 253, 254);
+                previousJump = Math.Abs(distance - lastDistance);
+                lastDistance = distance;
             }
         }
     }
@@ -100,14 +71,18 @@ namespace Void
         {
             hitWall = false;
         }
-        internal void DrawVerticalLine(int x, int startY, int endY, byte r, byte g, byte b, char c = '█')
+        internal void DrawVerticalLine(int x, int startY, int endY, byte r, byte g, byte b, bool verticalStripe = false, char c = '█')
         {
             ConsoleBuffer.Write(x, startY, c.ToString(), r, g, b);
-            for (int i = startY + 1; i < endY; i++)
-                    if (side == 0)
-                        ConsoleBuffer.Write(x, i, c.ToString(), 10, 10, 10);
-                    else
-                        ConsoleBuffer.Write(x, i, c.ToString(), 15, 15, 15);
+            if (!verticalStripe)
+                for (int i = startY + 1; i < endY; i++)
+                        if (side == 0)
+                            ConsoleBuffer.Write(x, i, c.ToString(), 10, 10, 10);
+                        else
+                            ConsoleBuffer.Write(x, i, c.ToString(), 15, 15, 15);
+            else
+                for (int i = startY + 1; i < endY; i++)
+                    ConsoleBuffer.Write(x, i, c.ToString(), r, g, b);
             ConsoleBuffer.Write(x, endY, c.ToString(), r, g, b);
         }
         private void CalculateValuesForCasting(Coordinates position, double dir)
@@ -167,11 +142,18 @@ namespace Void
             if (side == 0) distance = distanceToNextXBoundary - deltaX;
             else distance = distanceToNextYBoundary - deltaY;
 
-            hit.x = position.x + distance * Math.Cos(dir);
-            hit.y = position.y + distance * Math.Sin(dir);
+            hit.x = this.position.x + distance * Math.Cos(dir);
+            hit.y = this.position.y + distance * Math.Sin(dir);
 
             double lineHeight = ConsoleBuffer.Height / distance;
             return lineHeight;
+        }
+        internal bool IsOnEdge()
+        {
+            const double threshold = 0.001;
+            double remainderX = hit.x % 1;
+            double remainderY = hit.y % 1;
+            return ((remainderX < threshold || (1 - remainderX) > threshold) || (remainderY < threshold || (1 - remainderY) > threshold));
         }
     }
 }

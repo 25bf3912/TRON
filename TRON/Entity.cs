@@ -6,7 +6,7 @@ namespace Void
 {
     internal struct Coordinates
     {
-        public double x, y;
+        internal double x, y;
     }
     internal abstract class Entity
     {
