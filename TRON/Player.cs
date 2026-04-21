@@ -11,13 +11,17 @@ namespace Void
 {
     internal class Player : Entity
     {
-        internal Disc disc;
-        internal Player()
+        //internal Disc disc;
+        internal Player(double distance = 0, Coordinates positionToDraw = default) : base(distance, positionToDraw)
         {
             speed = 0.05;
             position.x = 2;
             position.y = 2;
-            disc = new Disc();
+            //disc = new Disc();
+        }
+        internal override void Draw()
+        {
+            throw new NotImplementedException();
         }
         internal override void Move()
         {
@@ -81,13 +85,13 @@ namespace Void
             if (dir < 0)
                 dir += Math.PI * 2;
         }
-        internal void TakeInputs()
-        {
-            if (Game.currentKeystrokes.Contains("TAB"))
-            {
-                if (!disc.isActive)
-                    disc.Throw(position, dir);
-            }
-        }
+        //internal void TakeInputs()
+        //{
+        //    if (Game.currentKeystrokes.Contains("TAB"))
+        //    {
+        //        if (!disc.isActive)
+        //            disc.Throw(position, dir);
+        //    }
+        //}
     }
 }

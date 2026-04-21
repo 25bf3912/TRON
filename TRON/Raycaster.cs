@@ -15,81 +15,18 @@ namespace Void
     internal class Raycaster
     {
         private int resolution;
-        double[] zBuffer;
+        internal List<Drawable> buffer;
         internal Raycaster()
         {
             resolution = ConsoleBuffer.Width;
-            zBuffer = new double[resolution];
-        }
-        internal void DrawDisc(Disc disc)
-        {
-            if (!disc.isActive) return;
-
-            double dx = disc.position.x - Game.player.position.x;
-            double dy = disc.position.y - Game.player.position.y;
-            double distToDisc = Math.Sqrt(dx * dx + dy * dy);
-
-            double angleToDisc = Math.Atan2(dy, dx);
-            double relativeAngle = angleToDisc - Game.player.dir;
-
-            while (relativeAngle < -Math.PI) relativeAngle += 2 * Math.PI;
-            while (relativeAngle > Math.PI) relativeAngle -= 2 * Math.PI;
-
-            double fov = Math.PI / 3;
-            int screenX = (int)((relativeAngle / (fov / 2)) * (resolution / 2) + (resolution / 2));
-
-            if (screenX >= 0 && screenX < resolution)
-            {
-                if (distToDisc < zBuffer[screenX])
-                {
-
-                    int baseHeight = (int)(ConsoleBuffer.Height / distToDisc);
-                    int screenMid = ConsoleBuffer.Height / 2;
-
-                    int startY = screenMid - (baseHeight / 20);
-                    int endY = screenMid + (baseHeight / 20);
-
-
-                    int halfWidth = (int)(15 / distToDisc);
-
-                    for (int xOffset = -halfWidth; xOffset <= halfWidth; xOffset++)
-                    {
-                        int targetX = screenX + xOffset;
-                        if (targetX >= 0 && targetX < resolution)
-                        {
-                            if (distToDisc < zBuffer[targetX])
-                            {
-                                for (int y = startY; y <= endY; y++)
-                                {
-                                    if (y >= 0 && y < ConsoleBuffer.Height)
-                                        ConsoleBuffer.Write(targetX, y, "█", 0, 255, 255);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        internal void DrawVerticalLine(int x, int startY, int endY, byte r, byte g, byte b, int side, bool verticalStripe = false, char c = '█')
-        {
-            ConsoleBuffer.Write(x, startY, c.ToString(), r, g, b);
-            if (!verticalStripe)
-                for (int i = startY + 1; i < endY; i++)
-                    if (side == 0)
-                        ConsoleBuffer.Write(x, i, c.ToString(), 10, 10, 10);
-                    else
-                        ConsoleBuffer.Write(x, i, c.ToString(), 15, 15, 15);
-            else
-                for (int i = startY + 1; i < endY; i++)
-                    ConsoleBuffer.Write(x, i, c.ToString(), r, g, b);
-            ConsoleBuffer.Write(x, endY, c.ToString(), r, g, b);
+            buffer = new List<Drawable>();
         }
         internal void Raycast(Coordinates position, double dir)
         {
             Ray r = new Ray();
             double lastLineHeight = 0;
             double previousJump = 0;
-
+            buffer.Clear();
             for (int i = 0; i < resolution; i++)
             {
                 double cameraX = 2.0 * i / resolution - 1.0;
@@ -98,7 +35,6 @@ namespace Void
                 double lineHeight = r.Cast(position, rayDir);
 
                 double distance = (double)ConsoleBuffer.Height / lineHeight;
-                zBuffer[i] = distance;
 
                 if (double.IsInfinity(lineHeight) || double.IsNaN(lineHeight))
                     lineHeight = 1000;
@@ -113,16 +49,24 @@ namespace Void
 
                 if (endY >= ConsoleBuffer.Height) endY = ConsoleBuffer.Height - 1;
 
-                if (Math.Abs(previousJump - Math.Abs(lineHeight - lastLineHeight)) > 0.6)
-
-                    DrawVerticalLine(i, startY, endY, 125, 253, 254, r.side, true);
-
+                if (Math.Abs(previousJump - Math.Abs(lineHeight - lastLineHeight)) > 0.2)
+                    buffer.Add(new Wall((125, 253, 254), startY, endY, distance, new Coordinates(i, 0)));
                 else
-                    DrawVerticalLine(i, startY, endY, 125, 253, 254, r.side);
+                    if (r.side == 0)
+                        buffer.Add(new Wall((10, 10, 10), startY, endY, distance, new Coordinates(i, 0)));
+                    else
+                        buffer.Add(new Wall((15, 15, 15), startY, endY, distance, new Coordinates(i, 0)));
                 previousJump = Math.Abs(lineHeight - lastLineHeight);
                 lastLineHeight = lineHeight;
             }
-            DrawDisc(Game.player.disc);
+            foreach (Entity e in Game.allEntities)
+                buffer.Add(e);
+            SortBuffer();
+        }
+        internal void SortBuffer()
+        {
+            buffer.Sort();
+            buffer.Reverse();
         }
     }
     internal class Ray
