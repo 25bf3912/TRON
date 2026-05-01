@@ -14,6 +14,15 @@ namespace Void
             this.y = y;
         }
     }
+    internal struct IntCoordinates
+    {
+        internal int x, y;
+        internal IntCoordinates(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+    }
     internal abstract class Entity : Drawable
     {
         internal Coordinates position;

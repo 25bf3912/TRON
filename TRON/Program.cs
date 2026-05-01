@@ -30,13 +30,14 @@ namespace Void
         }
         static void Main(string[] args)
         {
-            CalibrateScreen(944, 206);
+            Console.Title = "TRON";
+            CalibrateScreen(944, 355); // in cmd.exe do mode con: width=944 lines=206
             Menu menu = new Menu(ConsoleBuffer.Width / 2 - 50, ConsoleBuffer.Height / 2 - 12, 100, 25, (255, 255, 255), "PAUSE MENU");
-            using (var audioFile = new AudioFileReader("INIT.m4a"))
-            using (var outputDevice = new WaveOutEvent())
+            //using (var audioFile = new AudioFileReader("INIT.m4a"))
+            //using (var outputDevice = new WaveOutEvent())
             {
-                outputDevice.Init(audioFile);
-                outputDevice.Play();
+                //outputDevice.Init(audioFile);
+                //outputDevice.Play();
                 while (true)
                 {
                     Game.Tick();

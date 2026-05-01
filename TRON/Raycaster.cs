@@ -55,7 +55,7 @@ namespace Void
                     if (r.side == 0)
                         buffer.Add(new Wall((10, 10, 10), startY, endY, distance, new Coordinates(i, 0)));
                     else
-                        buffer.Add(new Wall((15, 15, 15), startY, endY, distance, new Coordinates(i, 0)));
+                        buffer.Add(new Wall((30, 30, 30), startY, endY, distance, new Coordinates(i, 0)));
                 previousJump = Math.Abs(lineHeight - lastLineHeight);
                 lastLineHeight = lineHeight;
             }
