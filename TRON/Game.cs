@@ -23,6 +23,7 @@ namespace Void
         internal static Raycaster r { get; private set; }
         private static Stopwatch timer;
         internal static List<Entity> allEntities { get; private set; }
+        internal static bool loading;
         static Game()
         {
             isRunning = true;
@@ -35,6 +36,7 @@ namespace Void
             timer = new Stopwatch();
             allEntities = new List<Entity>();
             allEntities.Add(new Recognizer((20, 20, 20), new Coordinates(5, 5), 0, new Coordinates(0, 0)));
+            loading = true;
         }
         internal static void Tick()
         {
