@@ -42,7 +42,6 @@ namespace Void
         }
         static async Task Main(string[] args)
         {
-            Renderer.LoadingBar(999999);
             Console.OutputEncoding = Encoding.Unicode;
             Console.Title = "TRON";
             CalibrateScreen(944, 355); // in cmd.exe do mode con: width=944 lines=206
@@ -51,6 +50,7 @@ namespace Void
             //using (var outputDevice = new WaveOutEvent())
             //outputDevice.Init(audioFile);
             //outputDevice.Play();
+            ConsoleBuffer.Fill(' ', 0, 0, 0);
             Renderer.LoadingBar(500);
             
             while (true)

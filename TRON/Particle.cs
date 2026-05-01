@@ -44,7 +44,7 @@ namespace TRON
                     velocityY = -bounceStrength;
             }
             position.y = (int)y;
-            ConsoleBuffer.WriteFiggle(position.x, position.y, ".");
+            ConsoleBuffer.Write(position.x, position.y, " _\n|_|");
             tick++;
         }
     }

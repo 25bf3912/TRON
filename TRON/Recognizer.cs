@@ -34,7 +34,9 @@ namespace TRON
                 ConsoleBuffer.Write(column, startY, "█", 180, 40, 40);
                 for (int i = startY + 1; i < endY; i++)
                     if (isEdge)
-                        ConsoleBuffer.Write(column, i, "█", colour.red, colour.green, colour.blue);
+                        ConsoleBuffer.Write(column, i, "█", 180, 40, 40);
+                    else
+                        ConsoleBuffer.Write(column, i, "█", 50, 50, 50);
                 ConsoleBuffer.Write(column, endY, "█", 180, 40, 40);
             }
         }

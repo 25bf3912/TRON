@@ -27,7 +27,7 @@ namespace TRON
             {
                 if (time == 0) return;
                 string message = "LOADING...";
-                //ConsoleBuffer.WriteFiggle(ConsoleBuffer.Width / 2 - message.Split('\n')[0].Length, ConsoleBuffer.Height / 2 + 5, message);
+                ConsoleBuffer.WriteFiggle(ConsoleBuffer.Width / 2 - message.Split('\n')[0].Length * 2, ConsoleBuffer.Height / 2 + 5, message);
                 foreach (LoadingParticle l in particles)
                     l.Tick();
                 ConsoleBuffer.Draw();
