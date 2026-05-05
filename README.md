@@ -5,14 +5,23 @@
 3. Run the command `.\TRON.exe`
 
 Congratulations! You have successfully started the program!
+
 Follow the onscreen instructions now. 
 ## Controls
 W - Walk Forwards
+
 S - Walk Backwards
+
 A - Strafe Left
+
 D - Strafe Right
+
 LEFT ARROW - Turn Left
+
 RIGHT ARROW - Turn Right
+
 TAB - Open Minimap (press and hold, release to close)
+
 ESCAPE - Pause (doesn't work yet)
+
 R - Regenerate Level
