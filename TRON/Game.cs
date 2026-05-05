@@ -37,7 +37,7 @@ namespace Void
             r = new Raycaster();
             timer = new Stopwatch();
             allEntities = new List<Entity>();
-            AddEntites();
+            //AddEntites();
             loading = true;
         }
         private static void AddEntites(int count = 32)

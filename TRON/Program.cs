@@ -57,12 +57,16 @@ namespace Void
 
             CalibrateScreen(944, 355); // in cmd.exe do mode con: width=944 lines=206
             Menu menu = new Menu(ConsoleBuffer.Width / 2 - 50, ConsoleBuffer.Height / 2 - 12, 100, 25, (255, 255, 255), "\nCALIBRATE YOUR SCREEN!\n\nPRESS ALT+ENTER TO ENTER FULLSCREEN.\nZOOM OUT UNTIL YOUR SCREEN BECOMES GREEN.\n\nPRESS ANY KEY TO START CALIBRATION.", false);
-            //using (var audioFile = new AudioFileReader("INIT.m4a"))
-            //using (var outputDevice = new WaveOutEvent())
-            //outputDevice.Init(audioFile);
-            //outputDevice.Play();
+            Renderer.LoadingBar(50);
 
-            //Renderer.LoadingBar(200);
+            using var audioFile = new AudioFileReader("Bonetrousle.m4a");
+
+            using var outputDevice = new WaveOutEvent();
+
+            outputDevice.Init(audioFile);
+            outputDevice.Play();
+
+
             Console.ReadKey();
             while (true)
             {
