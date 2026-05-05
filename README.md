@@ -28,3 +28,5 @@ ESCAPE - Pause (doesn't work yet)
 R - Regenerate Level (not recommended unless you want to)
 ## Notes
 I am not going to continue updating this game, however, if you wish do fork it, feel free to do so, just provide credit. 
+
+The verification code is `B8A3E7`

@@ -46,6 +46,8 @@ namespace Void
             Console.Title = "TRON";
             Console.WriteLine("Have you read README.md at https://github.com/25bf3912/TRON/blob/master/README.md (Y/N): ");
             if (Console.ReadLine().ToUpper().Substring(0, 1) != "Y") { Console.WriteLine("Read README.md at https://github.com/25bf3912/TRON/blob/master/README.md before continuing"); Console.ReadKey(); Environment.Exit(0); }
+            Console.WriteLine("Enter the *verification code* from README.md: ");
+            if (Console.ReadLine().ToUpper() != "B8A3E7") { Console.WriteLine("Incorrect verification code. ");  Console.WriteLine("Read README.md at https://github.com/25bf3912/TRON/blob/master/README.md before continuing"); Console.ReadKey(); Environment.Exit(0); }
             CalibrateScreen(944, 355); // in cmd.exe do mode con: width=944 lines=206
             Menu menu = new Menu(ConsoleBuffer.Width / 2 - 50, ConsoleBuffer.Height / 2 - 12, 100, 25, (255, 255, 255), "\nCALIBRATE YOUR SCREEN!\n\nPRESS ALT+ENTER TO ENTER FULLSCREEN.\nZOOM OUT UNTIL YOUR SCREEN BECOMES GREEN.\n\nPRESS ANY KEY TO START CALIBRATION.", false);
             //using (var audioFile = new AudioFileReader("INIT.m4a"))
