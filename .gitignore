@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Ignore the bin folder (this is likely already there)
+[Bb]in/
+
+# 3. exception for music
+!bin/**/*.m4a
