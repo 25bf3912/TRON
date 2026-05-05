@@ -2,8 +2,9 @@
 ## Instructions to play
 1. Install Windows Terminal (if you cannot do so, you can download a portable version from here https://github.com/asheroto/Terminal-Portable
 2. Download the latest ZIP from https://github.com/25bf3912/TRON/releases/tag/Release
-3. In Windows Terminal, navigate to the folder you have extracted the ZIP to
-4. Run the command `.\TRON.exe`
+3. In the `\assets` folder, copy `Bonetrousle.m4a` and paste it in `...\bin\Debug\net9.0`
+4. In Windows Terminal, navigate to the folder you have extracted the ZIP to
+5. Run the command `.\TRON.exe`
 
 Congratulations! You have successfully started the program!
 
