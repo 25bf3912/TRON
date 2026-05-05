@@ -1,8 +1,9 @@
 # TRON
 ## Instructions to play
 1. Install Windows Terminal (if you cannot do so, you can download a portable version from here https://github.com/asheroto/Terminal-Portable
-2. In Windows Terminal, navigate to `...\TRON\TRON\bin\Debug\net9.0`
-3. Run the command `.\TRON.exe`
+2. Download the latest ZIP from https://github.com/25bf3912/TRON/releases/tag/Release
+3. In Windows Terminal, navigate to the folder you have extracted the ZIP to
+4. Run the command `.\TRON.exe`
 
 Congratulations! You have successfully started the program!
 
@@ -25,3 +26,5 @@ TAB - Open Minimap (press and hold, release to close)
 ESCAPE - Pause (doesn't work yet)
 
 R - Regenerate Level
+## Notes
+I am not going to continue updating this game, however, if you wish do fork it, feel free to do so, just provide credit. 
