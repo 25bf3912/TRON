@@ -1,6 +1,7 @@
 ﻿using CustomConsole;
 using System;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
 using Void;
@@ -13,24 +14,20 @@ namespace TRON
         static Random rng;
         static World()
         {
-            grid = new char[2048, 2048];
+            grid = new char[128, 128];
             rng = new Random();
-            GenerateGrid();
-            GenerateOutline();
+            GenerateGrid(out Game.start);
             Game.loading = false;
         }
-        internal static async Task<bool> GenerateGrid()
+        internal static bool GenerateGrid(out IntCoordinates start)
         {
             int width = grid.GetLength(0);
             int height = grid.GetLength(1);
             for (int i = 0; i < width; i++)
                 for (int j = 0; j < height; j++)
                     grid[i, j] = '█';
-            IntCoordinates start = new IntCoordinates()
-            {
-                x = rng.Next(1, width - 1),
-                y = rng.Next(1, height - 1)
-            };
+            start.x = 1;
+            start.y = 1;
             start.x = start.x % 2 == 0 ? start.x - 1 : start.x;
             start.y = start.y % 2 == 0 ? start.y - 1 : start.y;
             bool[,] visited = new bool[width, height];
@@ -55,8 +52,34 @@ namespace TRON
                 visited[next.x, next.y] = true;
                 stack.Push(next);
             }
+            grid[width - 3, height - 3] = 'X';
+            DrawRoom(8, 0, true);
+            for (int i = 0; i < 128; i++)
+                DrawRoom(rng.Next(8));
+            for (int i = 0; i < 32; i++)
+                DrawRoom(rng.Next(16));
+            for (int i = 0; i < 8; i++)
+                DrawRoom(rng.Next(32));
+            for (int i = 0; i < 16; i++)
+                DrawRoom(rng.Next(8), 0);
             GenerateOutline();
             return true;
+        }
+        internal static void DrawRoom(int size = 10, double density = 0.3, bool startingRoom = false)
+        {
+            int x, y;
+            if (!startingRoom)
+{               x = rng.Next(1, grid.GetLength(0) - 2 - size);
+                y = rng.Next(1, grid.GetLength(1) - 2 - size);
+            }
+            else { x = 1; y = 1; }
+            for (int i = 0; i < size; i++)
+                for (int j = 0; j < size; j++)
+                {
+                    grid[x + i, y + j] = ' ';
+                    if (rng.NextDouble() < density)
+                        grid[x + i, y + j] = '█';
+                }
         }
         private static List<IntCoordinates> GetUnvisitedNeighbors(IntCoordinates node, bool[,] visited)
         {
@@ -91,12 +114,12 @@ namespace TRON
                 for (int j = 0; j < grid.GetLength(1); j++)
                     ConsoleBuffer.Write(i, j, new string(grid[i, j], 2), 255, 255, 255);
             ConsoleBuffer.Write((int)Game.player.position.x, (int)Game.player.position.y, "█", 255, 0, 0);
-            ConsoleBuffer.Write((int)Game.allEntities[0].position.x, (int)Game.allEntities[0].position.y, "█", 0, 255, 0);
+            foreach (Entity e in Game.allEntities)
+                ConsoleBuffer.Write((int)e.position.x, (int)e.position.y, "█", 0, 255, 0);
         }
         internal static void DrawHud()
         {
             DrawCrosshair();
-            //DrawMinimap();
         }
         private static void DrawCrosshair()
         {

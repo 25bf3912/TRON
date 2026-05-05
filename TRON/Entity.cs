@@ -29,12 +29,14 @@ namespace Void
         internal double dir;
         protected double speed;
 
-        internal Entity(double distance, Coordinates positionToDraw) : base(distance, positionToDraw)
-        {
-        }
+        internal Entity(double distance, Coordinates positionToDraw) : base(distance, positionToDraw) { }
 
         internal abstract void Move();
         internal abstract void Rotate();
         protected bool IsInWall() => World.grid[(int)position.x, (int)position.y] == '█';
+        internal bool IsColliding(Entity e)
+        {
+            return (int)e.position.x == (int)position.x && e.position.y == (int)position.y;
+        }
     }
 }

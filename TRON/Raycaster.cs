@@ -8,6 +8,7 @@ using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Web;
+using System.Xml;
 using TRON;
 
 namespace Void
@@ -48,14 +49,18 @@ namespace Void
                 if (startY < 0) startY = 0;
 
                 if (endY >= ConsoleBuffer.Height) endY = ConsoleBuffer.Height - 1;
-
-                if (Math.Abs(previousJump - Math.Abs(lineHeight - lastLineHeight)) > 0.2)
-                    buffer.Add(new Wall((125, 253, 254), startY, endY, distance, new Coordinates(i, 0)));
-                else
-                    if (r.side == 0)
-                        buffer.Add(new Wall((10, 10, 10), startY, endY, distance, new Coordinates(i, 0)));
+                if (!(lineHeight == 999999999999))
+                {
+                    if (Math.Abs(previousJump - Math.Abs(lineHeight - lastLineHeight)) > 0.2)
+                        buffer.Add(new Wall((125, 253, 254), startY, endY, distance, new Coordinates(i, 0)));
                     else
-                        buffer.Add(new Wall((30, 30, 30), startY, endY, distance, new Coordinates(i, 0)));
+                        if (r.side == 0)
+                            buffer.Add(new Wall((10, 10, 10), startY, endY, distance, new Coordinates(i, 0)));
+                        else
+                            buffer.Add(new Wall((30, 30, 30), startY, endY, distance, new Coordinates(i, 0)));
+                }
+                else
+                    buffer.Add(new Wall((180, 40, 40), startY, endY, distance, new Coordinates(i, 0)));
                 previousJump = Math.Abs(lineHeight - lastLineHeight);
                 lastLineHeight = lineHeight;
             }
@@ -126,6 +131,7 @@ namespace Void
         }
         internal double Cast(Coordinates position, double dir)
         {
+            double lineHeight;
             CalculateValuesForCasting(position, dir);
             while (!hitWall)
             {
@@ -141,8 +147,8 @@ namespace Void
                     distanceToNextYBoundary += deltaY;
                     side = 1;
                 }
-                if (World.grid[x, y] == '█')
-                    hitWall = true;
+                if (World.grid[x, y] == '█' || World.grid[x, y] == 'X')
+                    hitWall = true; 
             }
             if (side == 0) distance = distanceToNextXBoundary - deltaX;
             else distance = distanceToNextYBoundary - deltaY;
@@ -150,7 +156,9 @@ namespace Void
             hit.x = this.position.x + distance * Math.Cos(dir);
             hit.y = this.position.y + distance * Math.Sin(dir);
 
-            double lineHeight = ConsoleBuffer.Height / distance;
+            lineHeight = ConsoleBuffer.Height / distance;
+            if (World.grid[x, y] == 'X')
+                lineHeight = 999999999999;
             return lineHeight;
         }
     }
